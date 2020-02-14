@@ -1,8 +1,8 @@
 
 (defun cosine-similarity (x y) ;; Preguntar si debería comprobar los tamaños
-	(let ((product (* (euclidean-norm x) (euclidean-norm y))))
-		(if (/= 0 product)
-			(/ (scalar-product x y) product ))))
+	(let ((scal-product (scalar-product x y)) (norm-product (* (euclidean-norm x) (euclidean-norm y))))
+		(if (/= 0 norm-product)
+			(/ scal-product norm-product ))))
 
 (defun angular-distance (x y) 
 	(/ (acos (cosine-similarity x y)) pi))
