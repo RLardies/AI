@@ -2,7 +2,7 @@
 	(mapcar #'(lambda (x) (list el  x)) lst))
 
 (defun combine-lst-lst (lst1 lst2) 
-	(mapcar #'(lambda(x) (combine-elt-lst x lst2)) lst1))
+	(mapcan #'(lambda (x) (combine-elt-lst x lst2)) lst1))
 
 (defun combine-list-of-lsts (lstolsts) )
 
@@ -17,16 +17,16 @@
 
 ;; Apartado 2
 (equal (combine-lst-lst '(1 2) '(a b c))
-	'((1 a) (1 b) (1 c) (2 a) (2 b) (2 c))');; Test simple
+	'((1 a) (1 b) (1 c) (2 a) (2 b) (2 c)));; Test simple
 (equal (combine-lst-lst '(1 2) NIL) '((1) (2))) ;; Test segunda lista vacía
 (equal (combine-lst-lst NIL '(a b c)) '((a) (b) (c))) ;; Test primera lista vacía
 (equal (combine-lst-lst NIL NIL) NIL) ;; Test ambas listas vacías
 
 ;; Apartado 3
-(equal (combine-list-of-lsts '(1 2) '(a b) '("hola" "cosa"))
+(equal (combine-list-of-lsts '((1 2) (a b) ("hola" "cosa")))
 	'((1 a "hola") (1 a "cosa") (1 b "hola") (1 b "cosa") 
 	(2 a "hola") (2 a "cosa") (2 b "hola") (2 b "cosa"))) ;; Test simple
-(equal (combine-list-of-lsts (NIL '(1 2) '(a b))) 
+(equal (combine-list-of-lsts '(NIL '(1 2) '(a b))) 
 	(combine-lst-lst '(1 2) '(a b))) ;; Test con primer argumento NIL
 (equal (combine-list-of-lsts '(NIL '(1 2) NIL)) '(1 2)) ;; Test varios argumentos NIL
 (equal (combine-list-of-lsts '(NIL NIL NIL NIL)) NIL) ;; Test con todos argumentos NIL
