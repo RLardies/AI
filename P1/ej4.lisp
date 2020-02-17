@@ -2,7 +2,7 @@
 (defun cosine-similarity (x y) ;; Preguntar si debería comprobar los tamaños
 	(let ((scal-product (scalar-product x y)) 
 		(norm-product (* (euclidean-norm x) (euclidean-norm y))))
-		(if (/= 0 norm-product) "Si el producto de las normas es 0, devolver NIL"
+		(if (/= 0 norm-product) ;"Si el producto de las normas es 0, devolver NIL"
 			(/ scal-product norm-product ))))
 
 (defun angular-distance (x y) 

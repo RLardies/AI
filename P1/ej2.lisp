@@ -4,7 +4,18 @@
 (defun combine-lst-lst (lst1 lst2) 
 	(mapcan #'(lambda (x) (combine-elt-lst x lst2)) lst1))
 
-(defun combine-list-of-lsts (lstolsts) )
+(defun combine-list-of-lsts (lstolsts) 
+	(if (null (rest lstolsts)) ;Si la lista tiene un elemento
+		(first lstolsts)
+		(if (null (cddr lstolsts)) ; si la lista tiene dos elementos
+			(combine-lst-lst (first lstolsts) (cadr lstolsts))
+			(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts(rest lstolsts))))))
+
+(defun combine-lst-lst-aux (lst1 lst2)
+	(mapcan #'(lambda (x) (combine-elt-lst-aux x lst2)) lst1))
+
+(defun combine-elt-lst-aux (el lst)
+	(mapcar #'(lambda (x) (cons el  x)) lst))
 
 ;; Tests
 
@@ -23,6 +34,9 @@
 (equal (combine-lst-lst NIL NIL) NIL) ;; Test ambas listas vacías
 
 ;; Apartado 3
+ (equal (combine-list-of-lsts '((1 2) (3 4) (5 6)))
+'((1 3 5) (1 3 6) (1 4 5) (1 4 6) (2 3 5) (2 3 6) (2 4 5) (2 4 6)))
+
 (equal (combine-list-of-lsts '((1 2) (a b) ("hola" "cosa")))
 	'((1 a "hola") (1 a "cosa") (1 b "hola") (1 b "cosa") 
 	(2 a "hola") (2 a "cosa") (2 b "hola") (2 b "cosa"))) ;; Test simple
