@@ -51,13 +51,38 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  
 (defun bfs-improved (end queue net)
-  )
+	(if (null queue) 
+      NIL
+    (let* ((path (first queue))
+           (node (first path)))
+      (if (eql node end) 
+          (reverse path)
+        (bfs-improved end 
+             (append (rest queue) 
+                     (new-paths-improved path node net)) 
+             net)))))
+
+(defun new-paths-improved (path node net)
+                  (add-vecinos path (rest (assoc node net))))
+
+(defun add-vecinos (path vecinos)
+
+	(mapcar #'(lambda(x)
+		(add-to-path path x)) vecinos))
+
+
+
+(defun add-to-path (path n)
+	(if (null (member n path))
+		(cons n path)))
+
+	
 
 
 
 
-(defun shortest-path-improved (end queue net)
-  )
+(defun shortest-path-improved (start end net)
+	(bfs-improved end (list(list start)) net))
 
 
 ;El camino desde dt a cada vértice en este recorrido contiene el mínimo número de vértices. Es el camino más corto medido en número de vértices.
