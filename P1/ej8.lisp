@@ -66,19 +66,13 @@
                   (add-vecinos path (rest (assoc node net))))
 
 (defun add-vecinos (path vecinos)
-
 	(mapcar #'(lambda(x)
 		(add-to-path path x)) vecinos))
-
 
 
 (defun add-to-path (path n)
 	(if (null (member n path))
 		(cons n path)))
-
-	
-
-
 
 
 (defun shortest-path-improved (start end net)
