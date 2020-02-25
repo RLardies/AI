@@ -6,9 +6,8 @@
 
 (defun angular-distance (x y) 
 	(let ((cos-sim (cosine-similarity x y)))
-    (if (null cos-sim)
-      NIL
-      (/ (acos cos-sim) pi))))
+    	(if cos-sim
+      		(/ (acos cos-sim) pi))))
 
 ;; Tests
 
