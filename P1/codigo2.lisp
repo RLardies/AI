@@ -245,7 +245,7 @@
       * The implementation is recursive
       * It ignores the vectors in lst-vectors for which the 
         distance value cannot be computed."
-  (if lst-vectors
+  (if (and lst-vectors test-vector)
     (if (null (rest lst-vectors))
       (list (first lst-vectors) (funcall distance-fn (first lst-vectors) test-vector))
       (if (< (funcall distance-fn (first lst-vectors) test-vector) (funcall distance-fn (second lst-vectors) test-vector))
