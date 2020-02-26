@@ -255,12 +255,12 @@
       * The implementation is recursive
       * It ignores the vectors in lst-vectors for which the 
         distance value cannot be computed."
-  (if (and lst-vectors test-vector)
-    (if (null (rest lst-vectors))
-      (list (first lst-vectors) (funcall distance-fn (first lst-vectors) test-vector))
-      (if (< (funcall distance-fn (first lst-vectors) test-vector) (funcall distance-fn (second lst-vectors) test-vector))
-        (nearest-neighbor (remove (second lst-vectors) lst-vectors) test-vector distance-fn)
-        (nearest-neighbor (remove (first lst-vectors) lst-vectors) test-vector distance-fn)))))
+  (if (and lst-vectors test-vector) ; Comprueba que los argumentos no son nil
+    (if (null (rest lst-vectors)) ; Hace el caso de que solo se pase un vector para comparar
+      (list (first lst-vectors) (funcall distance-fn (first lst-vectors) test-vector)) ; devuelve la distancia entre el unico vector y el test
+      (if (< (funcall distance-fn (first lst-vectors) test-vector) (funcall distance-fn (second lst-vectors) test-vector));comprueba si hay mayor distancia con el primer vector o con el segundo
+        (nearest-neighbor (remove (second lst-vectors) lst-vectors) test-vector distance-fn); si es con el segundo lo borra de la lista de vectores y vuelve a llamar a la funcion sin ese vector
+        (nearest-neighbor (remove (first lst-vectors) lst-vectors) test-vector distance-fn))))); si es con el primero igual
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -326,7 +326,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  
-(defun bfs-improved (end queue net)
+(defun bfs-improved (end queue net); misma implementacion, solo cambia que llama a la funcion new-paths-improved
   (if (null queue) 
       NIL
     (let* ((path (first queue))
@@ -339,19 +339,19 @@
              net)))))
 
 (defun new-paths-improved (path node net)
-                  (add-vecinos path (rest (assoc node net))))
+                  (add-vecinos path (rest (assoc node net))));Llama add-vecinos
 
-(defun add-vecinos (path vecinos)
+(defun add-vecinos (path vecinos);añade los vecinos
   (mapcar #'(lambda(x)
     (add-to-path path x)) vecinos))
 
 
 (defun add-to-path (path n)
-  (if (null (member n path))
-    (cons n path)))
+  (if (null (member n path)); Solo cambia que introduce el nodo como vecino si este no se ha visitado antes para que no haya ciclos
+    (cons n path))) 
 
 
 
 
 (defun shortest-path-improved (end queue net)
-  (bfs-improved end (list(list start)) net))
+  (bfs-improved end (list(list start)) net)) ; misma implementacion que la dada
