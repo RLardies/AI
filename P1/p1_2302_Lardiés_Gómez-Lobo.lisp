@@ -1,4 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;    Autores: Rodrigo Lardiés Guillén
+;;             Carlos Gómez-Lobo Hernaiz
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (defun newton (f df-dx max-iter x0 &optional (tol-abs 0.0001))
@@ -15,9 +20,9 @@
     OUTPUT: estimation of the zero of f, NIL if not converged"
     (let ((df-dx-x0 (funcall df-dx x0))) ;; Calculamos el valor de la derivada en el punto
     (if (> (abs df-dx-x0) 1.0L-15) ;; Si la derivada es 0, devolver NIL
-      (let* ((f-x0 (funcall f x0)) (xn1 (- x0 (/ f-x0 df-dx-x0))))
-        (cond ((< max-iter 0) NIL) ((< (abs (- xn1 x0)) tol-abs) xn1)
-          (t (newton f df-dx (- max-iter 1) xn1 tol-abs)))))))
+      (let* ((f-x0 (funcall f x0)) (xn1 (- x0 (/ f-x0 df-dx-x0)))) ;; Relaizamos cálculos previos
+        (cond ((< max-iter 0) NIL) ((< (abs (- xn1 x0)) tol-abs) xn1) ;; Comprobamos si tenemos que seguir
+          (t (newton f df-dx (- max-iter 1) xn1 tol-abs))))))) ;; De ser así seguimos realizando el algoritmo
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -35,7 +40,8 @@
 
 
     OUTPUT: list of estimations of the zeros of f"
-    (mapcar #'(lambda (x0) (newton f df-dx max-iter x0 tol-abs)) seeds))
+    (mapcar #'(lambda (x0) (newton f df-dx max-iter x0 tol-abs)) seeds)) 
+    ;; Aplicamos el algoritmo de Newton a todos los elementos de la lista
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,6 +59,7 @@
                the first element of the pair is elt. 
                the second element is an element from lst"
   (mapcar #'(lambda (x) (list elt  x)) lst)) 
+  ;; Formamos una lista con el elemento y cada elemento de la lista
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -70,6 +77,7 @@
                the first element of the pair is from lst1. 
                the second element is an element from lst2"
   (mapcan #'(lambda (x) (combine-elt-lst x lst2)) lst1))
+  ;; Aplicamos la función anterior con cada elemento de la lista1 y la lista 2
 
   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -90,7 +98,7 @@
                  the Nth element is from list N"
   (if (null (rest lstolsts)) ;Si la lista tiene un elemento
     (first lstolsts)
-    (if (null (cddr lstolsts)) ; si la lista tiene dos elementos
+    (if (null (cddr lstolsts)) ; Si la lista tiene dos elementos
       (combine-lst-lst (first lstolsts) (cadr lstolsts))
       (combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts(rest lstolsts))))))
 
@@ -116,6 +124,7 @@
    NOTES: 
         * Implemented with mapcar"
   (apply #'+ (mapcar #'* x y)))
+  ;; Se multiplican las coordenadas de cada vector en orden y se suman los resultados
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -129,8 +138,7 @@
 
     OUTPUT: euclidean norm of x"
   (sqrt (apply #'+ (mapcar #'(lambda (x0) (* x0 x0)) x))))
-
-;; Comentario: Podría hacerse usando la anterior, pero creemos que es menos eficiente
+  ;; Se elevan al cuadrado las coordenadas, se suman los resultados y se hace la raíz cuadrada
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,6 +153,7 @@
 
     OUTPUT: euclidean distance between x and y"
   (euclidean-norm (mapcar #'- x y)))
+  ;; Se calcula la norma del vector resta
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -165,7 +174,7 @@
        * Evaluates to NIL (not defined)
          if at least one of the vectors has zero norm.
        * The two vectors are assumed to have the same length"
-  (let ((scal-product (scalar-product x y)) 
+  (let ((scal-product (scalar-product x y)) ;; Se hacen cálculos previos
     (norm-product (* (euclidean-norm x) (euclidean-norm y))))
     (if (/= 0 norm-product) ;; Si el producto de las normas es 0, devolver NIL
       (/ scal-product norm-product))))
@@ -189,8 +198,8 @@
       * Evaluates to NIL (not well defined)
         if at least one of the vectors has zero norm.
       * The two vectors are assumed to have the same length"
-  (let ((cos-sim (cosine-similarity x y)))
-    (if cos-sim
+  (let ((cos-sim (cosine-similarity x y))) ;; Se calcula la similitud del coseno
+    (if cos-sim ;; Si no es NIL, se realiza la operación
       (/ (acos cos-sim) pi))))
 
 
@@ -218,10 +227,11 @@
      NOTES: 
         * Uses remove-if and sort"
   
-  (sort (remove-if #'(lambda (x) (< (second x) threshold))
-    (mapcar #'(lambda (lst) 
-      (list lst (funcall similarity-fn lst test-vector))) lst-vectors)) #'(lambda (x y)
-       (> (second x) (second y)))))
+  (sort ;; Ordena los vectores según su similitud de mayor a menor
+  	(remove-if #'(lambda (x) (< (second x) threshold)) ;; Elimina los vectores cuya similitud es menor que el umbral
+    	(mapcar #'(lambda (lst) 
+      		(list lst (funcall similarity-fn lst test-vector))) lst-vectors)) #'(lambda (x y) ;; Calcula la similitud de cada vector
+       			(> (second x) (second y)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -277,11 +287,13 @@
 
 
 (defun backward-chaining-aux (goal lst-rules pending-goals)
-  (if (member goal pending-goals) NIL
-    (some #'(lambda (x) (if (equal (second x) goal) (if (null (car x)) t
-      (every #'(lambda (y) 
-        (backward-chaining-aux y (remove x lst-rules) (cons goal pending-goals))) (car x)))))
-    lst-rules)))
+  (if (member goal pending-goals) NIL ;; Si el goal está en la lista de pendientes se devuelve NIL
+    (some #'(lambda (x) ;; Se comprueba si se puede inferir el goal a partir de alguna regla
+      (cond ((null x) NIL) ((equal (second x) goal) ;; Comprueba que no es NIL y si el goal se puede inferir con la regla x
+        (if (null (car x)) t ;; De ser así, si la condición es NIL, es decir, es un hecho, se devuelve true
+        (every #'(lambda (y) ;; Si no, se llama a la función con cada átomo que conforma la regla
+          (backward-chaining-aux y (remove x lst-rules) (cons goal pending-goals))) (car x))))))
+      lst-rules)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
