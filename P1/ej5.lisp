@@ -5,3 +5,9 @@
 			 (> (second x) (second y)))))
 
 
+(equal (select-vectors '((-1 -1 -1) (-1 -1 1) (-1 1 1) (1 1 1))
+ '(1 1 1) #'cosine-similarity 0.2) (list (list '(1 1 1) '1.0) (list '(-1 1 1) '0.33333334))
+
+
+(select-vectors '((-1 -1 -1) (-1 -1 1) (-1 1 1) (1 1 1))
+ '(0 0 0) #'cosine-similarity 0.2)
