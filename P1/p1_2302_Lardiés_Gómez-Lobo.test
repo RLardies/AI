@@ -81,10 +81,3 @@
 (equal (nearest-neighbor '((1 2 3) (-1 2 5) (-2 -3 1)) '(1 1 1) #'angular-distance) '((1 2 3) 0.12337583)) ;; Test simple
 (null (nearest-neighbor NIL '(1 2 3) #'angular-distance)) ;; Lista de vectores vacía
 (null (nearest-neighbor '((1 2 3) (4 5 6)) NIL #'angular-distance)) ;; Vector test NIL
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Ejercicio 7
-(backward-chaining 'Q '((NIL A) (NIL B) ((P) Q) ((L M) P) ((B L) M) ((A P) L) ((A B) L))) ;; Test que si encuentra
-(not (backward-chaining 1 '((NIL 3) (NIL 5) ((2 3) 4) ((5 6) 2) ((3 7) 6) (NIL 8)))) ;; Test que no encuentra
-(not (backward-chaining 'Q NIL)) ;; Test con nil como lista
