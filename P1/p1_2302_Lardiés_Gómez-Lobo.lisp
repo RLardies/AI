@@ -226,13 +226,16 @@
      
      NOTES: 
         * Uses remove-if and sort"
-  
-  (sort ;; Ordena los vectores según su similitud de mayor a menor
-  	(remove-if #'(lambda (x) (< (second x) threshold)) ;; Elimina los vectores cuya similitud es menor que el umbral
-    	(mapcar #'(lambda (lst) 
-      		(list lst (funcall similarity-fn lst test-vector))) lst-vectors)) #'(lambda (x y) ;; Calcula la similitud de cada vector
-       			(> (second x) (second y)))))
 
+
+
+  (sort ;; Ordena los vectores según su similitud de mayor a menor
+    (remove-if #'(lambda (x) (or (null x) (< (second x) threshold)));; Elimina los vectores cuya similitud es menor que el umbral
+      (mapcar #'(lambda (lst) 
+        (let ((simil (funcall similarity-fn lst test-vector))) (unless (null simil) (list lst simil)))) lst-vectors)) #'(lambda (x y) ;; Calcula la similitud de cada vector
+         (> (second x) (second y)))))
+  
+  
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
