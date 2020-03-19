@@ -296,16 +296,16 @@
 ;;
 
 (defun succ (node lst-edges)
-  (navigate (node-city lst-edges)))
+  (navigate (node-city node) lst-edges))
 
 (defparameter *travel*
   (make-problem
     :cities               *cities*
     :initial-city         *origin*
-    :f-h                  f-h
-    :f-goal-test          f-goal-test
-    :f-search-state-equal f-search-state-equal
-    :succ                 succ))
+    :f-h                  'f-h
+    :f-goal-test          'f-goal-test
+    :f-search-state-equal 'f-search-state-equal
+    :succ                 'succ))
 
 
 ;;
@@ -350,25 +350,27 @@
 (defun expand-node (node problem)
   (let ((lst-actions (funcall (problem-succ problem) node *trains*))
         (f-h (problem-f-h problem)))
-    (expand-node-aux node f-h lst-actions NIL)))
+    (expand-node-action node f-h lst-actions NIL)))
 
-(defun expand-node-action node f-h lst-acitions ret
-  (let* ((action (car lst-actions))
-         (new-city (action-final action))
-         (new-depth (+ (node-depth node) 1))
-         (g (action-cost action)) 
-         (h (funcall f-h new-city *heuristic*))
-         (f (+ g h))
-         (new-node
-            (make-node
-              :city     new-city
-              :parent   node
-              :action   action
-              :depth    new-depth
-              :g        g
-              :h        h
-              :f        f)))
-    expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))
+(defun expand-node-action (node f-h lst-actions ret)
+  (if (null lst-actions)
+    ret
+    (let* ((action (car lst-actions))
+           (new-city (action-final action))
+           (new-depth (+ (node-depth node) 1))
+           (g (action-cost action)) 
+           (h (funcall f-h new-city *heuristic*))
+           (f (+ g h))
+           (new-node
+              (make-node
+                :city     new-city
+                :parent   node
+                :action   action
+                :depth    new-depth
+                :g        g
+                :h        h
+                :f        f)))
+      (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))
 
 
 
