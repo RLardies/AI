@@ -296,7 +296,7 @@
 ;;
 
 (defun succ (node lst-edges)
-  (navigate (node-city lst-edges))
+  (navigate (node-city lst-edges)))
 
 (defparameter *travel*
   (make-problem
@@ -331,6 +331,8 @@
 ;; that action.
 ;;
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
 ;;  Creates a list with all the nodes that can be reached from the
@@ -344,9 +346,29 @@
 ;;    A list (node_1,...,node_n) of nodes that can be reached from the
 ;;    given one
 ;;
-(defun expand-node (node problem)
-  )
 
+(defun expand-node (node problem)
+  (let ((lst-actions (funcall (problem-succ problem) node *trains*))
+        (f-h (problem-f-h problem)))
+    (expand-node-aux node f-h lst-actions NIL)))
+
+(defun expand-node-action node f-h lst-acitions ret
+  (let* ((action (car lst-actions))
+         (new-city (action-final action))
+         (new-depth (+ (node-depth node) 1))
+         (g (action-cost action)) 
+         (h (funcall f-h new-city *heuristic*))
+         (f (+ g h))
+         (new-node
+            (make-node
+              :city     new-city
+              :parent   node
+              :action   action
+              :depth    new-depth
+              :g        g
+              :h        h
+              :f        f)))
+    expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))
 
 
 
@@ -399,7 +421,7 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-)
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
