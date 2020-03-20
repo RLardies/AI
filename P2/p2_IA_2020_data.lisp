@@ -347,11 +347,6 @@
 ;;    given one
 ;;
 
-(defun expand-node (node problem)
-  (let ((lst-actions (funcall (problem-succ problem) node *trains*))
-        (f-h (problem-f-h problem)))
-    (expand-node-action node f-h lst-actions NIL)))
-
 (defun expand-node-action (node f-h lst-actions ret)
   (if (null lst-actions)
     ret
@@ -372,12 +367,15 @@
                 :f        f)))
       (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))
 
-
+(defun expand-node (node problem)
+  (let ((lst-actions (funcall (problem-succ problem) node *trains*))
+        (f-h (problem-f-h problem)))
+    (expand-node-action node f-h lst-actions NIL)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;;  BEGIN Exercise 7 -- Node list management
-;;;  
+;;; 
 ;;;  Merges two lists of nodes, one of them ordered with respect to a
 ;;;  given strategy, keeping the result ordered with respect to the
 ;;;  same strategy.
@@ -422,8 +420,16 @@
 ;;    those of the list "nodes@. The list is ordered with respect to the 
 ;;   criterion node-compare-p.
 ;; 
+(defun insert-node (node lst-nodes node-compare-p)
+  (let ((first-node (car lst-nodes)))
+    (if (node-compare-p node first-node)
+      (cons node lst-nodes)
+      (cons first-node (insert-node node (cdr lst-nodes) node-compare-p)))))
+
 (defun insert-nodes (nodes lst-nodes node-compare-p)
-  )
+  (if (null nodes)
+    lst-nodes
+    (insert-nodes (cdr nodes) (insert-node (car nodes) lst-nodes node-compare-p) node-compare-p)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -451,7 +457,7 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-  )
+  (insert-nodes nodes (strategy-node-compare-p strategy)))
 
 
 ;;
