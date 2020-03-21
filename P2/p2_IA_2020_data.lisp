@@ -421,10 +421,12 @@
 ;;   criterion node-compare-p.
 ;; 
 (defun insert-node (node lst-nodes node-compare-p)
-  (let ((first-node (car lst-nodes)))
-    (if (node-compare-p node first-node)
-      (cons node lst-nodes)
-      (cons first-node (insert-node node (cdr lst-nodes) node-compare-p)))))
+  (if (null lst-nodes)
+    (list node)
+    (let ((first-node (car lst-nodes)))
+      (if (node-compare-p node first-node)
+        (cons node lst-nodes)
+        (cons first-node (insert-node node (cdr lst-nodes) node-compare-p)))))
 
 (defun insert-nodes (nodes lst-nodes node-compare-p)
   (if (null nodes)
