@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
 ;;    Lab assignment 2: Search
 ;;
@@ -459,7 +459,7 @@
 ;;   use it to call insert-nodes.
 ;;
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-  (insert-nodes nodes (strategy-node-compare-p strategy)))
+  (insert-nodes nodes lst-nodes (strategy-node-compare-p strategy)))
 
 
 ;;
@@ -477,9 +477,19 @@
 ;; us which nodes should be analyzed first. In the A* strategy, the first 
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
+
+
+
+(defun node-compare-p(node-1 node-2)
+  (if (= (node-f node-1) (node-f node-2))
+    (<= (node-depth node-1) (node-depth node-2))
+    (< (node-f node-1) (node-f node-2))))
+
 (defparameter *A-star*
-  NIL
-  )
+  (make-strategy
+    :name 'A-star
+    :node-compare-p #'node-compare-p))
+
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
 ;;
@@ -537,7 +547,25 @@
 ;;    and an empty closed list.
 ;;
 (defun graph-search (problem strategy)
-)
+  (let* ((node-ini (make-node 
+                :city (problem-initial-city problem)
+                :h (funcall(problem-f-h problem) (problem-initial-city problem) *heuristic*)))
+
+    (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
+    (closed-nodes '()))
+    (if (eq open-nodes '())
+      open-nodes
+      (graph-search-aux problem strategy open-nodes '(node-ini)))))
+
+(defun graph-search-aux (problem strategy open-nodes closed-nodes)
+  (let ((node-aux (first open-nodes)))
+    (if (funcall(problem-f-goal-test problem) node-aux)
+      node-aux
+      (if (exp-condition node-aux closed-nodes)
+        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes '(node-aux)))))))
+
+(defun exp-condition(node closed-nodes)
+  (OR (eq (member node closed-nodes) NIL) (< (node-g node) (node-g (first(member node closed-nodes))))))
 
 
 ;;
