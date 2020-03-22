@@ -353,7 +353,7 @@
     (let* ((action (car lst-actions))
            (new-city (action-final action))
            (new-depth (+ (node-depth node) 1))
-           (g (action-cost action)) 
+           (g (+ (action-cost action) (node-g node))) 
            (h (funcall f-h new-city *heuristic*))
            (f (+ g h))
            (new-node
@@ -365,7 +365,11 @@
                 :g        g
                 :h        h
                 :f        f)))
-      (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))
+      (if (null (node-parent node))
+        (expand-node-action node f-h (cdr lst-actions) (cons new-node ret))
+        (if (eq (node-city new-node) (node-city (node-parent node)))
+          (expand-node-action node f-h (cdr lst-actions) ret)
+          (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))))
 
 (defun expand-node (node problem)
   (let ((lst-actions (funcall (problem-succ problem) node *trains*))
@@ -553,13 +557,13 @@
 
     (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
     (closed-nodes '()))
-    (if (eq open-nodes '())
+      (if (eq open-nodes '())
       open-nodes
       (graph-search-aux problem strategy open-nodes '(node-ini)))))
 
 (defun graph-search-aux (problem strategy open-nodes closed-nodes)
   (let ((node-aux (first open-nodes)))
-    (if (funcall(problem-f-goal-test problem) node-aux)
+    (if (funcall(problem-f-goal-test problem) node-aux *destination* *mandatory*)
       node-aux
       (if (exp-condition node-aux closed-nodes)
         (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes '(node-aux)))))))
@@ -567,6 +571,13 @@
 (defun exp-condition(node closed-nodes)
   (OR (eq (member node closed-nodes) NIL) (< (node-g node) (node-g (first(member node closed-nodes))))))
 
+
+
+
+
+
+(defun a-star-search (problem)
+  (graph-search problem *A-star*))
 
 ;;
 ;; END: Exercise 9 -- Search algorithm
@@ -581,7 +592,60 @@
 ;*** solution-path ***
 
 (defun solution-path (node)
-)
+  (if (null (node-parent node))
+    (node-city node)
+    (solution-path-aux node (list (node-city node)))))
+
+(defun solution-path-aux(node path)
+  (if (null (node-parent node))
+    path
+    (solution-path-aux (node-parent node) (cons (node-city (node-parent node)) path))))
+
+
+
+(defun action-sequence (node) 
+  (if (null (node-action node))
+    nil
+    (action-sequence-aux (node-parent node) (list (action-name (node-action node))))))
+  
+
+(defun action-sequence-aux (node actions)
+  (if (null (node-action node))
+    actions
+    (action-sequence-aux (node-parent node) (cons  (action-name (node-action node)) actions))))
+  
+
+;;; 
+;;;    END Exercise 10: Solution path / action sequence
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    BEGIN Exercise 11: Depth First and Breadth First
+;;;
+
+
+
+(defun depth-first-node-compare-p (node-1 node-2) 
+  (< (node-depth node-1) (node-depth node-2)))
+
+(defparameter *depth-first*
+  (make-strategy
+    :name 'depth-first
+    :node-compare-p #'depth-first-node-compare-p))
+
+(defun breadth-first-node-compare-p (node-1 node-2)  
+  (> (node-depth node-1) (node-depth node-2)))
+
+
+(defparameter *breadth-first*
+  (make-strategy
+    :name 'breadth-first
+    :node-compare-p #'breadth-first-node-compare-p))
+
+
+
 
 
 ;;; 
