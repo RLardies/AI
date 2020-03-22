@@ -484,7 +484,7 @@
 
 
 
-(defun node-compare-p(node-1 node-2)
+(defun A-star-node-compare-p(node-1 node-2)
   (if (= (node-f node-1) (node-f node-2))
     (<= (node-depth node-1) (node-depth node-2))
     (< (node-f node-1) (node-f node-2))))
@@ -492,7 +492,7 @@
 (defparameter *A-star*
   (make-strategy
     :name 'A-star
-    :node-compare-p #'node-compare-p))
+    :node-compare-p #'A-star-node-compare-p))
 
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
