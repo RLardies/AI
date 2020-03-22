@@ -367,7 +367,7 @@
                 :f        f)))
       (if (null (node-parent node))
         (expand-node-action node f-h (cdr lst-actions) (cons new-node ret))
-        (if (eq (node-city new-node) (node-city (node-parent node)))
+        (if (equal (node-city new-node) (node-city (node-parent node)))
           (expand-node-action node f-h (cdr lst-actions) ret)
           (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))))
 
@@ -428,7 +428,7 @@
   (if (null lst-nodes)
     (list node)
     (let ((first-node (car lst-nodes)))
-      (if (node-compare-p node first-node)
+      (if (funcall node-compare-p node first-node)
         (cons node lst-nodes)
         (cons first-node (insert-node node (cdr lst-nodes) node-compare-p))))))
 
