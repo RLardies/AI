@@ -1,4 +1,4 @@
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
 ;;    Lab assignment 2: Search
 ;;
@@ -182,19 +182,22 @@
 (defun navigate-aux (city lst-edges res)
   (if (null lst-edges) 
     res
-    (let* ((edge (car lst-edges)) (origin (car edge)) (dest (second edge)) (cost (third edge)))
-        (if (equal origin city)
-          (navigate-aux 
-            city 
-            (cdr lst-edges) 
-            (cons 
-              (make-action
-                :name   (format NIL "Tren de ~A a ~A" origin dest)
-                :origin origin
-                :final  dest
-                :cost   cost) 
-              res))
-          (navigate-aux city (cdr lst-edges) res)))))
+    (let* ((edge (car lst-edges)) 
+           (origin (car edge))
+           (dest (second edge))
+           (cost (third edge)))
+      (if (equal origin city)
+        (navigate-aux 
+          city 
+          (cdr lst-edges) 
+          (cons 
+            (make-action
+              :name   (format NIL "Tren de ~A a ~A" origin dest)
+              :origin origin
+              :final  dest
+              :cost   cost) 
+            res))
+        (navigate-aux city (cdr lst-edges) res)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -267,9 +270,9 @@
 ;;
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
   (if (equal (node-city node-1) (node-city node-2))
-    (every 
+    (notany 
       #'(lambda (city) 
-        (and 
+        (xor 
           (mandatory-node-check node-1 city) 
           (mandatory-node-check node-2 city)))
       mandatory)))
@@ -554,26 +557,25 @@
   (let* ((node-ini (make-node 
                 :city (problem-initial-city problem)
                 :h (funcall(problem-f-h problem) (problem-initial-city problem) *heuristic*)))
-
-    (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
-    (closed-nodes '()))
-      (if (equal open-nodes '())
-      open-nodes
+          (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
+          (closed-nodes '()))
+    (if (null open-nodes)
+      NIL
       (graph-search-aux problem strategy open-nodes (list node-ini)))))
 
 (defun graph-search-aux (problem strategy open-nodes closed-nodes)
   (let ((node-aux (first open-nodes)))
-    (if (funcall(problem-f-goal-test problem) node-aux *destination* *mandatory*)
+    (if (funcall (problem-f-goal-test problem) node-aux *destination* *mandatory*)
       node-aux
       (if (exp-condition problem node-aux closed-nodes)
-        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes (list node-aux)))
+        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (cons node-aux closed-nodes))
         (graph-search-aux problem strategy (rest open-nodes) closed-nodes )))))
 
 
 
 (defun node-in-list(problem node closed-nodes)
   (if (null closed-nodes)
-    nil
+    NIL
     (if (funcall(problem-f-search-state-equal problem) node (first closed-nodes) *mandatory*)
       (first closed-nodes)
       (node-in-list problem node (rest closed-nodes)))))
@@ -581,7 +583,7 @@
 
 (defun exp-condition(problem node closed-nodes)
  (let ((node-copy (node-in-list problem node closed-nodes)))
-   (OR (null node-copy) (< (node-g node) (node-g node-copy)))))
+   (or (null node-copy) (< (node-g node) (node-g node-copy)))))
 
 
 (defun a-star-search (problem)
@@ -633,8 +635,6 @@
 ;;;    BEGIN Exercise 11: Depth First and Breadth First
 ;;;
 
-
-
 (defun depth-first-node-compare-p (node-1 node-2) 
   (> (node-depth node-1) (node-depth node-2)))
 
@@ -651,10 +651,6 @@
   (make-strategy
     :name 'breadth-first
     :node-compare-p #'breadth-first-node-compare-p))
-
-
-
-
 
 ;;; 
 ;;;    END Exercise 10: Solution path / action sequence
