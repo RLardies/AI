@@ -557,26 +557,31 @@
 
     (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
     (closed-nodes '()))
-      (if (eq open-nodes '())
-      open-nodes2
-      (graph-search-aux problem strategy open-nodes '(node-ini)))))
+      (if (equal open-nodes '())
+      open-nodes
+      (graph-search-aux problem strategy open-nodes (list node-ini)))))
 
 (defun graph-search-aux (problem strategy open-nodes closed-nodes)
   (let ((node-aux (first open-nodes)))
     (if (funcall(problem-f-goal-test problem) node-aux *destination* *mandatory*)
       node-aux
-      (if (and (exp-condition problem node-aux closed-nodes) (not (equal (node-city node-aux) (problem-initial-city problem))))
-        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes '(node-aux)))
-        (graph-search-aux problem strategy (rest open-nodes) (append closed-nodes '(node-aux)))))))
+      (if (exp-condition problem node-aux closed-nodes)
+        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes (list node-aux)))
+        (graph-search-aux problem strategy (rest open-nodes) closed-nodes )))))
+
+
+
+(defun node-in-list(problem node closed-nodes)
+  (if (null closed-nodes)
+    nil
+    (if (funcall(problem-f-search-state-equal problem) node (first closed-nodes) *mandatory*)
+      (first closed-nodes)
+      (node-in-list problem node (rest closed-nodes)))))
 
 
 (defun exp-condition(problem node closed-nodes)
-  (OR (equal (member node closed-nodes) NIL) 
-    (and (funcall (problem-f-search-state-equal problem) node (first (member node closed-nodes)) *mandatory*) (< (node-g node) (node-g (first (member node closed-nodes)))))))
-
-
-
-
+ (let ((node-copy (node-in-list problem node closed-nodes)))
+   (OR (null node-copy) (< (node-g node) (node-g node-copy)))))
 
 
 (defun a-star-search (problem)
