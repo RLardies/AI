@@ -23,10 +23,9 @@
  (list (alpha-beta-searcher 2 #'count-difference)
        (alpha-beta-searcher 2 #'mobility)
        #'random-strategy)
- 5
+ 50
  10
  '(count-difference
    mobility
-   random-strategy)
- )
+   random-strategy))
 
