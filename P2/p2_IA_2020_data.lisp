@@ -558,18 +558,21 @@
     (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
     (closed-nodes '()))
       (if (eq open-nodes '())
-      open-nodes
+      open-nodes2
       (graph-search-aux problem strategy open-nodes '(node-ini)))))
 
 (defun graph-search-aux (problem strategy open-nodes closed-nodes)
   (let ((node-aux (first open-nodes)))
     (if (funcall(problem-f-goal-test problem) node-aux *destination* *mandatory*)
       node-aux
-      (if (exp-condition node-aux closed-nodes)
-        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes '(node-aux)))))))
+      (if (and (exp-condition problem node-aux closed-nodes) (not (equal (node-city node-aux) (problem-initial-city problem))))
+        (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (append closed-nodes '(node-aux)))
+        (graph-search-aux problem strategy (rest open-nodes) (append closed-nodes '(node-aux)))))))
 
-(defun exp-condition(node closed-nodes)
-  (OR (eq (member node closed-nodes) NIL) (< (node-g node) (node-g (first(member node closed-nodes))))))
+
+(defun exp-condition(problem node closed-nodes)
+  (OR (equal (member node closed-nodes) NIL) 
+    (and (funcall (problem-f-search-state-equal problem) node (first (member node closed-nodes)) *mandatory*) (< (node-g node) (node-g (first (member node closed-nodes)))))))
 
 
 
@@ -628,7 +631,7 @@
 
 
 (defun depth-first-node-compare-p (node-1 node-2) 
-  (< (node-depth node-1) (node-depth node-2)))
+  (> (node-depth node-1) (node-depth node-2)))
 
 (defparameter *depth-first*
   (make-strategy
@@ -636,7 +639,7 @@
     :node-compare-p #'depth-first-node-compare-p))
 
 (defun breadth-first-node-compare-p (node-1 node-2)  
-  (> (node-depth node-1) (node-depth node-2)))
+  (< (node-depth node-1) (node-depth node-2)))
 
 
 (defparameter *breadth-first*
