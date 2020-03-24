@@ -350,7 +350,36 @@
 ;;    given one
 ;;
 
-(defun expand-node-action (node f-h lst-actions ret)
+(defun expand-node-action (node f-h action)
+  (let* ((new-city (action-final action))
+         (new-depth (+ (node-depth node) 1))
+         (g (+ (action-cost action) (node-g node))) 
+         (h (funcall f-h new-city))
+         (f (+ g h))
+         (new-node
+            (make-node
+              :city     new-city
+              :parent   node
+              :action   action
+              :depth    new-depth
+              :g        g
+              :h        h
+              :f        f)))
+    (if (null (node-parent node))
+      new-node
+      (if (equal (node-city new-node) (node-city (node-parent node)))
+        NIL
+        new-node))))
+
+(defun expand-node (node problem)
+  (let ((lst-actions (funcall (problem-succ problem) node))
+        (f-h (problem-f-h problem)))
+    (remove-if #'null 
+      (mapcar 
+        #'(lambda (action) (expand-node-action node f-h action))
+        lst-actions))))
+
+(defun expand-node-action2 (node f-h lst-actions ret)
   (if (null lst-actions)
     ret
     (let* ((action (car lst-actions))
@@ -369,15 +398,15 @@
                 :h        h
                 :f        f)))
       (if (null (node-parent node))
-        (expand-node-action node f-h (cdr lst-actions) (cons new-node ret))
+        (expand-node-action2 node f-h (cdr lst-actions) (cons new-node ret))
         (if (equal (node-city new-node) (node-city (node-parent node)))
-          (expand-node-action node f-h (cdr lst-actions) ret)
-          (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))))
+          (expand-node-action2 node f-h (cdr lst-actions) ret)
+          (expand-node-action2 node f-h (cdr lst-actions) (cons new-node ret)))))))
 
-(defun expand-node (node problem)
+(defun expand-node2 (node problem)
   (let ((lst-actions (funcall (problem-succ problem) node))
         (f-h (problem-f-h problem)))
-    (expand-node-action node f-h lst-actions NIL)))
+    (expand-node-action2 node f-h lst-actions NIL)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -653,6 +682,48 @@
     :node-compare-p #'breadth-first-node-compare-p))
 
 ;;; 
-;;;    END Exercise 10: Solution path / action sequence
+;;;    END Exercise 11: Depth First and Breadth First
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 
+;;;    BEGIN Exercise 12:  Heuristica de coste
+;;;
+
+(defparameter *heuristic-new* 
+  '((Calais 0.0) (Reims 20.0) (Paris 27.0) 
+    (Nancy 43.0) (Orleans 51.0) (St-Malo 59.0)
+    (Nantes 71.0) (Brest 85.0) (Nevers 65.0) 
+    (Limoges 95.0) (Roenne 83.0) (Lyon 100.0)
+    (Toulouse 129.0) (Avignon 115.0) (Marseille 135.0)))
+
+(defparameter *travel-new*
+  (make-problem
+    :cities               *cities*
+    :initial-city         *origin*
+    :f-h                  #'(lambda(c) (f-h c *heuristic-new*))
+    :f-goal-test          #'(lambda(n) (f-goal-test n *destination* *mandatory*))
+    :f-search-state-equal #'(lambda(n1 n2) (f-search-state-equal n1 n2 *mandatory*))
+    :succ                 #'(lambda(n) (succ n *trains*))))
+
+(defparameter *heuristic-cero* 
+  '((Calais 0.0) (Reims 0.0) (Paris 0.0) 
+    (Nancy 0.0) (Orleans 0.0) (St-Malo 0.0)
+    (Nantes 0.0) (Brest 0.0) (Nevers 0.0) 
+    (Limoges 0.0) (Roenne 0.0) (Lyon 0.0)
+    (Toulouse 0.0) (Avignon 0.0) (Marseille 0.0)))
+
+(defparameter *travel-cero*
+  (make-problem
+    :cities               *cities*
+    :initial-city         *origin*
+    :f-h                  #'(lambda(c) (f-h c *heuristic-cero*))
+    :f-goal-test          #'(lambda(n) (f-goal-test n *destination* *mandatory*))
+    :f-search-state-equal #'(lambda(n1 n2) (f-search-state-equal n1 n2 *mandatory*))
+    :succ                 #'(lambda(n) (succ n *trains*))))
+
+;;; 
+;;;    END Exercise 12:  Heuristica de coste
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -143,4 +143,3 @@
 (node-g (graph-search *travel* *A-star*)) ;; 202.0
 (node-city (graph-search *travel* *A-star*)) ;; CALAIS
 (node-city (node-parent (graph-search *travel* *A-star*))) ;; PARIS
-
