@@ -305,10 +305,10 @@
   (make-problem
     :cities               *cities*
     :initial-city         *origin*
-    :f-h                  'f-h
-    :f-goal-test          'f-goal-test
-    :f-search-state-equal 'f-search-state-equal
-    :succ                 'succ))
+    :f-h                  #'(lambda(c) (f-h c *heuristic*))
+    :f-goal-test          #'(lambda(n) (f-goal-test n *destination* *mandatory*))
+    :f-search-state-equal #'(lambda(n1 n2) (f-search-state-equal n1 n2 *mandatory*))
+    :succ                 #'(lambda(n) (succ n *trains*))))
 
 
 ;;
@@ -357,7 +357,7 @@
            (new-city (action-final action))
            (new-depth (+ (node-depth node) 1))
            (g (+ (action-cost action) (node-g node))) 
-           (h (funcall f-h new-city *heuristic*))
+           (h (funcall f-h new-city))
            (f (+ g h))
            (new-node
               (make-node
@@ -375,7 +375,7 @@
           (expand-node-action node f-h (cdr lst-actions) (cons new-node ret)))))))
 
 (defun expand-node (node problem)
-  (let ((lst-actions (funcall (problem-succ problem) node *trains*))
+  (let ((lst-actions (funcall (problem-succ problem) node))
         (f-h (problem-f-h problem)))
     (expand-node-action node f-h lst-actions NIL)))
 
@@ -556,7 +556,7 @@
 (defun graph-search (problem strategy)
   (let* ((node-ini (make-node 
                 :city (problem-initial-city problem)
-                :h (funcall(problem-f-h problem) (problem-initial-city problem) *heuristic*)))
+                :h (funcall(problem-f-h problem) (problem-initial-city problem))))
           (open-nodes (insert-nodes-strategy (expand-node node-ini problem) '() strategy))
           (closed-nodes '()))
     (if (null open-nodes)
@@ -565,7 +565,7 @@
 
 (defun graph-search-aux (problem strategy open-nodes closed-nodes)
   (let ((node-aux (first open-nodes)))
-    (if (funcall (problem-f-goal-test problem) node-aux *destination* *mandatory*)
+    (if (funcall (problem-f-goal-test problem) node-aux)
       node-aux
       (if (exp-condition problem node-aux closed-nodes)
         (graph-search-aux problem strategy (insert-nodes-strategy (expand-node node-aux problem) (rest open-nodes) strategy) (cons node-aux closed-nodes))
@@ -576,7 +576,7 @@
 (defun node-in-list(problem node closed-nodes)
   (if (null closed-nodes)
     NIL
-    (if (funcall(problem-f-search-state-equal problem) node (first closed-nodes) *mandatory*)
+    (if (funcall(problem-f-search-state-equal problem) node (first closed-nodes))
       (first closed-nodes)
       (node-in-list problem node (rest closed-nodes)))))
 
@@ -636,7 +636,7 @@
 ;;;
 
 (defun depth-first-node-compare-p (node-1 node-2) 
-  (> (node-depth node-1) (node-depth node-2)))
+  t)
 
 (defparameter *depth-first*
   (make-strategy
@@ -644,7 +644,7 @@
     :node-compare-p #'depth-first-node-compare-p))
 
 (defun breadth-first-node-compare-p (node-1 node-2)  
-  (< (node-depth node-1) (node-depth node-2)))
+  nil)
 
 
 (defparameter *breadth-first*
