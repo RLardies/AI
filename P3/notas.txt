@@ -1,3 +1,14 @@
 COUNT-DIFFERENCE     116.:  --- 42.5 73.0 --> 0.385
 MOBILITY             133.: 57.5  --- 75.0 --> 0.4417
 RANDOM-STRATEGY      52.0: 27.0 25.0  --- --> 0.173
+
+COUNT-DIFFERENCE     89.5:  --- 21.0 23.0 20.0 25.5 
+MOBILITY             100.: 19.0  --- 24.0 25.0 32.0 
+ALEAT-EXAMPLES       78.0: 17.0 16.0  --- 18.5 26.5 
+TOKENS-PER-ROW       81.0: 20.0 15.0 21.5  --- 24.5 
+RANDOM-STRATEGY      51.5: 14.5  8.0 13.5 15.5  --- 
+
+COUNT-DIFFERENCE     59.5:  --- 21.5  9.5 28.5 
+MOBILITY             54.0: 18.5  ---  5.5 30.0 
+WEIGHT-FN            99.0: 30.5 34.5  --- 34.0 
+RANDOM-STRATEGY      27.5: 11.5 10.0  6.0  --- 

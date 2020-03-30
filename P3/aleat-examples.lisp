@@ -1,18 +1,18 @@
 ;; Alias que aparece en el ranking
 
-(defvar *alias* '|Aleatorio estudiando funciones de ejemplo|)
+(defvar *alias* '|Ejemplarmente aleatorio|)
 
 ;; Función de evalueación heurística
 
 (defun eval-fn (player board)
-	(let ((num (random 1.0)))
-		(cond 
-			((num < 0.385)
-				(count-difference player board))
-			((num < 0.827)
-				(mobility player board))
-			(t 
-				(random 64)))))
+  (let ((num (random 1.0)))
+    (cond 
+      ((< num 0.385)
+        (count-difference player board))
+      ((< num 0.827)
+        (mobility player board))
+      (t 
+        (random 64)))))
 
 ;; Funciones auxiliares 
 
