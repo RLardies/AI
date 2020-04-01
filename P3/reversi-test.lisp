@@ -65,7 +65,7 @@
 (defun weight-mobility (player board)
   (let ((status (game-status player board))
         (mobility-value (mobility player board))
-        (weight-value (weight player board)))
+        (weight-value (weight-fn player board)))
     (+ (/ (* status weight-value) 64) (/ (* (- 64 status) mobility-value) 64))))
 
 ;; (reversi #'human (alpha-beta-searcher 2 #'mobility))
