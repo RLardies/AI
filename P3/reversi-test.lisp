@@ -66,10 +66,16 @@
   (let ((status (game-status player board))
         (mobility-value (mobility player board))
         (weight-value (weight-fn player board))
-        (opponent-legal-moves (legal-moves (opponent player board))))
-    (if (null opponent-legal-moves)
+        (opponent-legal-moves (legal-moves (opponent player) board)))
+    (if (parity-check player board)
       10000
       (+ (/ (* status weight-value) 64) (/ (* (- 64 status) mobility-value) 64)))))
+
+(defun parity-check (player board)
+  (let ((status (game-status player board)))
+    (and (null (legal-moves (opponent player) board))
+         (or (and (= player 1) (oddp status))
+             (and (= player 2) (evenp status))))))
 
 
 ;; (reversi #'human (alpha-beta-searcher 2 #'mobility))
