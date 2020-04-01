@@ -65,8 +65,12 @@
 (defun weight-mobility (player board)
   (let ((status (game-status player board))
         (mobility-value (mobility player board))
-        (weight-value (weight-fn player board)))
-    (+ (/ (* status weight-value) 64) (/ (* (- 64 status) mobility-value) 64))))
+        (weight-value (weight-fn player board))
+        (opponent-legal-moves (legal-moves (opponent player board))))
+    (if (null opponent-legal-moves)
+      10000
+      (+ (/ (* status weight-value) 64) (/ (* (- 64 status) mobility-value) 64)))))
+
 
 ;; (reversi #'human (alpha-beta-searcher 2 #'mobility))
 
