@@ -1,7 +1,7 @@
 (defvar *alias* '|Cansao de la cuarentena ya|)
 
 ;; Función de evalueación heurística
-(defun corners-pro (player board)
+(defun eval-fn (player board)
   (let ((status (game-status player board))
         (mobility-value (mobility player board))
         (weight-value (weightini-fn player board))

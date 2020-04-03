@@ -1,4 +1,4 @@
-(defvar *alias* '|Empezamos a ponernos serios|)
+(defvar *alias* '|Basta ya por favor quiero salir|)
 
 ;; Función de evalueación heurística
 (defun eval-fn (player board)

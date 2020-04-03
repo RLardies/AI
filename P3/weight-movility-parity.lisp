@@ -1,6 +1,6 @@
 ;; Alias que aparece en el ranking
 
-(defvar *alias* '|Empezamos a ponernos serios|)
+(defvar *alias* '|Botellon delante de EPS|)
 
 ;; Función de evalueación heurística
 (defun eval-fn (player board)
