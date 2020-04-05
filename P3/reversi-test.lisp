@@ -140,16 +140,10 @@
 ;; (reversi #'human (alpha-beta-searcher 2 #'mobility))
 
 (round-robin
- (list (alpha-beta-searcher 2 #'weight-fn)
-       (alpha-beta-searcher 2 #'weight-mobility)
-       (alpha-beta-searcher 2 #'weight-mobility-corner)
-       (alpha-beta-searcher 2 #'corners-pro)
+ (list (alpha-beta-searcher 2 #'eval-fn)
        #'random-strategy)
- 20
+ 2
  10
- '(weight-fn
-   weight-mobility
-   weight-mobility-corner 
-   weight-mobility-corner2
+ '(eval-fn
    random-strategy))
 
